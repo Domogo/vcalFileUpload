@@ -1,23 +1,33 @@
 package com.domogo.vcalfileupload.controller;
 
+import java.util.List;
+
 import com.domogo.vcalfileupload.service.FileStorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@RequestMapping("/api/v1/upload")
 @RestController
 public class UploadController {
 
     @Autowired
     FileStorageService fileStorageService;
 
-    @PostMapping("/uploadSequential")
-    public void uploadSequential(@RequestParam("files") MultipartFile[] files) {
-        for (MultipartFile file : files) {
-            fileStorageService.storeFileSequential(file);
+    @PostMapping
+    public void upload(@RequestParam("files") List<MultipartFile> files) {
+        if (files.size() == 0) {
+            // return correct HTTP code
+            return;
+        } else if (files.size() == 1) {
+            fileStorageService.storeFile(files.get(0));
+        } else {
+            // call parallel
+            fileStorageService.storeFileSequential(files);
         }
     }
 

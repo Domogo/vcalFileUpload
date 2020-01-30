@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import com.domogo.vcalfileupload.property.StorageProperties;
 
@@ -30,7 +31,29 @@ public class FileStorageService {
         }
     }
 
-    public void storeFileSequential(MultipartFile file) {
+
+    public void storeFileSequential(List<MultipartFile> files) {
+
+        for (MultipartFile file : files) {
+            // save file, get name, type and size and store in memory
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+            try {
+                if (fileName.contains("..")) {
+                    throw new RuntimeException("Filename contains invalid path sequence" + fileName);
+                }
+
+                Path targetLocation = this.fileStorageLocation.resolve(fileName);
+                Files.copy(file.getInputStream(), targetLocation);
+            } catch (IOException ex) {
+                throw new RuntimeException("Could not store file " + fileName + ". Please try again.");
+            }
+
+        }
+    }
+
+
+    public void storeFile(MultipartFile file) {
 
         // save file, get name, type and size and store in memory
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -45,6 +68,7 @@ public class FileStorageService {
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again.");
         }
+
     }
 
 }
