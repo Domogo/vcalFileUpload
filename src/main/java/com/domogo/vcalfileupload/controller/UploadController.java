@@ -18,17 +18,16 @@ public class UploadController {
     @Autowired
     FileStorageService fileStorageService;
 
+
     @PostMapping
     public void upload(@RequestParam("files") List<MultipartFile> files) {
-        if (files.size() == 0) {
-            // return correct HTTP code
-            return;
-        } else if (files.size() == 1) {
-            fileStorageService.storeFile(files.get(0));
-        } else {
-            // call parallel
-            fileStorageService.storeFileSequential(files);
-        }
+        fileStorageService.storeFiles(files);
+    }
+
+
+    @PostMapping(path = "sequential")
+    public void uploadSequential(@RequestParam("files") List<MultipartFile> files) {
+        fileStorageService.storeFiles(files);
     }
 
 }

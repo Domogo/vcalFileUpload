@@ -7,48 +7,23 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import com.domogo.vcalfileupload.property.StorageProperties;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class FileStorageService {
 
-    private Path fileStorageLocation;
-
-    @Autowired
-    public void StorageProperties(StorageProperties storageProperties) {
-        this.fileStorageLocation = Paths.get(storageProperties.getUploadLocation())
-                .toAbsolutePath().normalize();
-
-        try {
-            Files.createDirectories(this.fileStorageLocation);
-        } catch (Exception ex) {
-            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
-        }
-    }
+    private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir"))
+        .toAbsolutePath().normalize();
 
 
-    public void storeFileSequential(List<MultipartFile> files) {
+    public void storeFiles(List<MultipartFile> files) {
 
         for (MultipartFile file : files) {
-            // save file, get name, type and size and store in memory
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-
-            try {
-                if (fileName.contains("..")) {
-                    throw new RuntimeException("Filename contains invalid path sequence" + fileName);
-                }
-
-                Path targetLocation = this.fileStorageLocation.resolve(fileName);
-                Files.copy(file.getInputStream(), targetLocation);
-            } catch (IOException ex) {
-                throw new RuntimeException("Could not store file " + fileName + ". Please try again.");
-            }
-
+            storeFile(file);
         }
     }
 
@@ -60,13 +35,13 @@ public class FileStorageService {
 
         try {
             if (fileName.contains("..")) {
-                throw new RuntimeException("Filename contains invalid path sequence" + fileName);
+                throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Filename contains invalid path sequence" + fileName);
             }
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ex) {
-            throw new RuntimeException("Could not store file " + fileName + ". Please try again.");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Could not store file " + fileName + ". Please try again.");
         }
 
     }

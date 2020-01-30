@@ -10,7 +10,7 @@ through a REST API. Two different upload options: sequential and concurrent (par
 ## Project requirements
 - RestController
 - Max. 8 threads.
-- 100 parallel uploads, 50MB in size
+- accept 100 parallel uploads at any given time, each up to 50MB in size
 - Parallel upload can not allow same-named files, sequential overrides previous.
 
 ## API docs
