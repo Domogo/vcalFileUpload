@@ -13,4 +13,6 @@ public interface FileRepository extends CrudRepository<File, Long> {
 
     List<File> findByInProgress(boolean inProgress);
 
+    List<File> findAll();
+
 }

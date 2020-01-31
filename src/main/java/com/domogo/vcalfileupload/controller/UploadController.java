@@ -2,9 +2,11 @@ package com.domogo.vcalfileupload.controller;
 
 import java.util.List;
 
+import com.domogo.vcalfileupload.model.File;
 import com.domogo.vcalfileupload.service.FileStorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +30,12 @@ public class UploadController {
     @PostMapping(path = "multiple")
     public void uploadMultiple(@RequestParam("files") List<MultipartFile> files) {
         fileStorageService.storeFiles(files);
+    }
+
+
+    @GetMapping(path = "duration")
+    public List<File> uploadDuration() {
+        return fileStorageService.findAll();
     }
 
 }

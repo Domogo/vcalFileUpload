@@ -81,4 +81,8 @@ public class FileStorageService {
         return fileRepository.save(file);
     }
 
+    public List<File> findAll() {
+        return fileRepository.findAll();
+    }
+
 }
