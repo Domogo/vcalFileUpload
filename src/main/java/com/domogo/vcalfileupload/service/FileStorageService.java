@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.domogo.vcalfileupload.repository.FileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -14,6 +17,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class FileStorageService {
+
+    @Autowired
+    FileRepository fileRepository;
 
     private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir"))
         .toAbsolutePath().normalize();
