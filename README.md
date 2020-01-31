@@ -1,32 +1,41 @@
 # vcalFileUpload
+
 - Spring Boot
 - Java 11
 - Maven
 
 ## About
+
 vcalFileUpload is a file upload service made with Spring Boot. Enables file upload
 through a REST API. Two different upload options: sequential and concurrent (parallel).
 
 ## Project requirements
+
 - RestController
-- Max. 8 threads.
+- Server can have max. 8 threads.
 - accept 100 parallel uploads at any given time, each up to 50MB in size
-- Parallel upload can not allow same-named files, sequential overrides previous.
+- Parallel upload can not allow same-named files, sequential overrides existing files with the same name.
+
+## Details
+
+- files are stored in your (OS-specific) TMP dir.
+- in-memory DB (hibernate) has a File Model that creates a record on upload.
 
 ## API docs
 
-### upload sequential
-- http://localhost:9090/api/v1/upload/sequential
+### upload files
 
-- accepts multiple files, stores files one by one, using a for loop.
+- POST: `http://localhost:9090/api/v1/upload`
 
-### upload concurrent (parallel)
-- http://localhost:9090/api/v1/upload/concurrent
+### upload multiple
 
-- accepts multiple files, using threads it stores multiple files at once.
+- POST: `http://localhost:9090/api/v1/upload/multiple`
 
 ### track progress
-- http://localhost:9090/api/v1/upload/progress
+
+- GET: `http://localhost:9090/api/v1/upload/progress`
 
 ### track duration
-- http://localhost:9090/api/v1/upload/duration
+
+- GET: `http://localhost:9090/api/v1/upload/duration`
+- For finished uploads displays the time it took to upload them.

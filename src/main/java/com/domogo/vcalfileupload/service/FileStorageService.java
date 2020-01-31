@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
 
 import com.domogo.vcalfileupload.model.File;
@@ -50,8 +51,11 @@ public class FileStorageService {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Filename contains invalid path sequence" + fileName);
             }
 
+            Date date = new Date();
+            long timestamp = date.getTime();
             // create a db record
             File fileData = new File();
+            fileData.setId(fileName + '-' + timestamp);
             fileData.setFileSize(file.getSize());
             fileData.setName(fileName);
             fileData = saveOrUpdate(fileData);
@@ -75,10 +79,6 @@ public class FileStorageService {
 
     public File saveOrUpdate(File file) {
         return fileRepository.save(file);
-    }
-
-    public File findByName(String name) {
-        return fileRepository.findByName(name);
     }
 
 }

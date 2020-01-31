@@ -1,5 +1,6 @@
 package com.domogo.vcalfileupload.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.domogo.vcalfileupload.model.File;
@@ -10,8 +11,6 @@ public interface FileRepository extends CrudRepository<File, Long> {
 
     Optional<File> findById(Long id);
 
-    Optional<File> findByInProgress(boolean inProgress);
-
-    File findByName(String name);
+    List<File> findByInProgress(boolean inProgress);
 
 }
