@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.domogo.vcalfileupload.model.File;
 import com.domogo.vcalfileupload.repository.FileRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,8 @@ public class FileStorageService {
 
     public void storeFile(MultipartFile file) {
 
+        long startTime = System.currentTimeMillis();
+
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No file present in request.");
         }
@@ -47,14 +50,35 @@ public class FileStorageService {
                 throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Filename contains invalid path sequence" + fileName);
             }
 
+            // create a db record
+            File fileData = new File();
+            fileData.setFileSize(file.getSize());
+            fileData.setName(fileName);
+            fileData = saveOrUpdate(fileData);
+
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             // before writing, delete file if exists.
             Files.deleteIfExists(targetLocation);
             Files.copy(file.getInputStream(), targetLocation);
+
+            long duration = System.currentTimeMillis() - startTime;
+            // update that db record with upload duration and set inProgress to false
+            fileData.setDuration(duration);
+            fileData.setInProgress(false);
+            saveOrUpdate(fileData);
+
         } catch (IOException ex) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Could not store file " + fileName + ". Please try again.");
         }
 
+    }
+
+    public File saveOrUpdate(File file) {
+        return fileRepository.save(file);
+    }
+
+    public File findByName(String name) {
+        return fileRepository.findByName(name);
     }
 
 }

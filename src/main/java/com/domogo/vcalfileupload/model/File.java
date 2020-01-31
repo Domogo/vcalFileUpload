@@ -18,12 +18,14 @@ public class File {
     @Column(unique = true)
     private String name;
 
-    private long file;
+    private long fileSize;
 
-    // How much has been uploaded so far
-    private long uploaded;
+    // How much of the file has been uploaded so far
+    private long uploaded = 0;
 
-    private boolean inProgress;
+    private boolean inProgress = true;
+
+    private long duration = 0;
 
     public File() {}
 
@@ -43,16 +45,16 @@ public class File {
         this.name = name;
     }
 
-    public long getFile() {
-        return this.file;
-    }
-
-    public void setFile(long file) {
-        this.file = file;
-    }
-
     public long getUploaded() {
         return this.uploaded;
+    }
+
+    public long getFileSize() {
+        return this.fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public void setUploaded(long uploaded) {
@@ -71,14 +73,12 @@ public class File {
         this.inProgress = inProgress;
     }
 
-    public float getDurationTime() {
-        return this.durationTime;
+    public long getDuration() {
+        return this.duration;
     }
 
-    public void setDurationTime(float durationTime) {
-        this.durationTime = durationTime;
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
-
-    private float durationTime;
 
 }
