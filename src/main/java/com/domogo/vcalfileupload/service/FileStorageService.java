@@ -85,4 +85,12 @@ public class FileStorageService {
         return fileRepository.findAll();
     }
 
+    public List<File> findByInProgress(boolean in_progress) {
+        return fileRepository.findByInProgress(in_progress);
+    }
+
+    public List<Object[]> getFilesDuration() {
+        return fileRepository.getFilesDuration();
+    }
+
 }

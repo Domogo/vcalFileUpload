@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.domogo.vcalfileupload.model.File;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 public interface FileRepository extends CrudRepository<File, Long> {
@@ -14,5 +15,8 @@ public interface FileRepository extends CrudRepository<File, Long> {
     List<File> findByInProgress(boolean inProgress);
 
     List<File> findAll();
+
+    @Query("SELECT id, name, duration FROM File where in_progress = FALSE")
+    List<Object[]> getFilesDuration();
 
 }

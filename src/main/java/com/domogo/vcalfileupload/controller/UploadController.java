@@ -35,7 +35,7 @@ public class UploadController {
 
     @GetMapping(path = "duration")
     public List<File> uploadDuration() {
-        return fileStorageService.findAll();
+        return fileStorageService.findByInProgress(false);
     }
 
 }
