@@ -20,13 +20,13 @@ public class UploadController {
 
 
     @PostMapping
-    public void upload(@RequestParam("files") List<MultipartFile> files) {
-        fileStorageService.storeFiles(files);
+    public void upload(@RequestParam("file") MultipartFile file) {
+        fileStorageService.storeFile(file);
     }
 
 
-    @PostMapping(path = "sequential")
-    public void uploadSequential(@RequestParam("files") List<MultipartFile> files) {
+    @PostMapping(path = "multiple")
+    public void uploadMultiple(@RequestParam("files") List<MultipartFile> files) {
         fileStorageService.storeFiles(files);
     }
 

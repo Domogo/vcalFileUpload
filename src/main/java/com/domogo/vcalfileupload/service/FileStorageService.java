@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -30,6 +29,10 @@ public class FileStorageService {
 
     public void storeFile(MultipartFile file) {
 
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No file present in request.");
+        }
+
         // save file, get name, type and size and store in memory
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
@@ -39,7 +42,9 @@ public class FileStorageService {
             }
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
-            Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            // before writing, delete file if exists.
+            Files.deleteIfExists(targetLocation);
+            Files.copy(file.getInputStream(), targetLocation);
         } catch (IOException ex) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Could not store file " + fileName + ". Please try again.");
         }
