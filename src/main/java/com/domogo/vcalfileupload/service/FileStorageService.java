@@ -7,8 +7,9 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
-import com.domogo.vcalfileupload.model.File;
+import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.repository.FileRepository;
+import com.domogo.vcalfileupload.utils.WriteFileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,22 +55,22 @@ public class FileStorageService {
             Date date = new Date();
             long timestamp = date.getTime();
             // create a db record
-            File fileData = new File();
-            fileData.setId(fileName + '-' + timestamp);
-            fileData.setFileSize(file.getSize());
-            fileData.setName(fileName);
-            fileData = saveOrUpdate(fileData);
+            FileRecord fileRecord = new FileRecord();
+            fileRecord.setId(fileName + '-' + timestamp);
+            fileRecord.setFileSize(file.getSize());
+            fileRecord.setName(fileName);
+            fileRecord = saveOrUpdate(fileRecord);
 
             Path targetLocation = this.fileStorageLocation.resolve(fileName);
             // before writing, delete file if exists.
             Files.deleteIfExists(targetLocation);
-            Files.copy(file.getInputStream(), targetLocation);
+            WriteFileUtil.copyInputStreamToFile(file.getInputStream(), targetLocation.toFile(), fileRecord);
 
             long duration = System.currentTimeMillis() - startTime;
             // update that db record with upload duration and set inProgress to false
-            fileData.setDuration(duration);
-            fileData.setInProgress(false);
-            saveOrUpdate(fileData);
+            fileRecord.setDuration(duration);
+            fileRecord.setInProgress(false);
+            saveOrUpdate(fileRecord);
 
         } catch (IOException ex) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Could not store file " + fileName + ". Please try again.");
@@ -77,15 +78,15 @@ public class FileStorageService {
 
     }
 
-    public File saveOrUpdate(File file) {
+    public FileRecord saveOrUpdate(FileRecord file) {
         return fileRepository.save(file);
     }
 
-    public List<File> findAll() {
+    public List<FileRecord> findAll() {
         return fileRepository.findAll();
     }
 
-    public List<File> findByInProgress(boolean in_progress) {
+    public List<FileRecord> findByInProgress(boolean in_progress) {
         return fileRepository.findByInProgress(in_progress);
     }
 

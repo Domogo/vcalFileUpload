@@ -2,7 +2,7 @@ package com.domogo.vcalfileupload.controller;
 
 import java.util.List;
 
-import com.domogo.vcalfileupload.model.File;
+import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.service.FileStorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class UploadController {
 
 
     @GetMapping(path = "duration")
-    public List<File> uploadDuration() {
+    public List<FileRecord> uploadDuration() {
         return fileStorageService.findByInProgress(false);
     }
 

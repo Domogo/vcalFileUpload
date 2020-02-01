@@ -3,20 +3,20 @@ package com.domogo.vcalfileupload.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.domogo.vcalfileupload.model.File;
+import com.domogo.vcalfileupload.model.FileRecord;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-public interface FileRepository extends CrudRepository<File, Long> {
+public interface FileRepository extends CrudRepository<FileRecord, Long> {
 
-    Optional<File> findById(Long id);
+    Optional<FileRecord> findById(Long id);
 
-    List<File> findByInProgress(boolean inProgress);
+    List<FileRecord> findByInProgress(boolean inProgress);
 
-    List<File> findAll();
+    List<FileRecord> findAll();
 
-    @Query("SELECT id, name, duration FROM File where in_progress = FALSE")
+    @Query("SELECT id, name, duration FROM FileRecord where in_progress = FALSE")
     List<Object[]> getFilesDuration();
 
 }

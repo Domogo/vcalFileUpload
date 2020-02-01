@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
 @Entity
-public class File {
+public class FileRecord {
 
     @Id
     private String id;
@@ -22,7 +22,8 @@ public class File {
 
     private long duration = 0;
 
-    public File() {}
+    public FileRecord() {
+    }
 
     public String getId() {
         return this.id;
