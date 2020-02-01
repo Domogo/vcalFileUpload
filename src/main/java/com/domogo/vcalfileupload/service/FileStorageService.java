@@ -90,8 +90,8 @@ public class FileStorageService {
         return fileRepository.findByInProgress(in_progress);
     }
 
-    public List<Object[]> getFilesDuration() {
-        return fileRepository.getFilesDuration();
+    public List<Object[]> getUploadProgress() {
+        return fileRepository.getUploadProgress();
     }
 
 }

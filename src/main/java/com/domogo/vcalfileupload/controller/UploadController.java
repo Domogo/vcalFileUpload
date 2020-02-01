@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.service.FileStorageService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +36,11 @@ public class UploadController {
     public List<FileRecord> uploadDuration() {
         return fileStorageService.findByInProgress(false);
     }
+
+    @GetMapping(path = "progress")
+    public List<Object[]> getUploadProgress() {
+        return fileStorageService.getUploadProgress();
+    }
+
 
 }

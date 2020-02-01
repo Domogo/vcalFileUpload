@@ -16,7 +16,7 @@ public interface FileRepository extends CrudRepository<FileRecord, Long> {
 
     List<FileRecord> findAll();
 
-    @Query("SELECT id, name, duration FROM FileRecord where in_progress = FALSE")
-    List<Object[]> getFilesDuration();
+    @Query("SELECT id, fileSize, uploaded FROM FileRecord WHERE inProgress = TRUE")
+    List<Object[]> getUploadProgress();
 
 }
