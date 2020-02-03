@@ -13,6 +13,7 @@ import com.domogo.vcalfileupload.utils.WriteFileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,23 +32,30 @@ public class FileStorageService {
     public void storeFiles(List<MultipartFile> files) {
 
         for (MultipartFile file : files) {
-            storeFile(file);
+            storeFile(file, null);
         }
     }
 
 
-    public void storeFile(MultipartFile file) {
+    public void storeFile(MultipartFile file, @Nullable String fileName) {
 
+        // get start time, we have to track upload duration
         long startTime = System.currentTimeMillis();
 
         if (file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No file present in request.");
         }
 
-        // save file, get name, type and size and store in memory
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        List<String> filesCurrentlyUploading = getFileNamesInProgress();
-        long activeUploadsCount = countByInProgress(true);
+        if (fileName.isEmpty() ){
+            fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        } else {
+            // if file name already file type in name, remove it
+            // We add the correct type using .getContentType from Multipart files
+            fileName = StringUtils.cleanPath(fileName.substring(0, fileName.indexOf(".")) + '.' + file.getContentType().split("/")[1]);
+        }
+
+        List<String> filesCurrentlyUploading = fileRepository.getFileNamesInProgress();
+        long activeUploadsCount = fileRepository.countByInProgress(true);
 
         if (filesCurrentlyUploading.contains(fileName)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "File " + fileName + " is currently uploading.");
@@ -76,10 +84,9 @@ public class FileStorageService {
             Files.deleteIfExists(targetLocation);
             WriteFileUtil.copyInputStreamToFile(file.getInputStream(), targetLocation.toFile(), fileRecord);
 
-            long duration = System.currentTimeMillis() - startTime;
             // update that db record with upload duration and set inProgress to false
-            fileRecord.setDuration(duration);
-            // fileRecord.setInProgress(false);
+            fileRecord.setDuration(System.currentTimeMillis() - startTime);
+            fileRecord.setInProgress(false);
             saveOrUpdate(fileRecord);
 
         } catch (IOException ex) {
@@ -102,14 +109,6 @@ public class FileStorageService {
 
     public List<Object[]> getUploadProgress() {
         return fileRepository.getUploadProgress();
-    }
-
-    public List<String> getFileNamesInProgress() {
-        return fileRepository.getFileNamesInProgress();
-    }
-
-    public long countByInProgress(boolean inProgress) {
-        return fileRepository.countByInProgress(inProgress);
     }
 
 }

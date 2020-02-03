@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.service.FileStorageService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,10 +21,9 @@ public class UploadController {
     @Autowired
     FileStorageService fileStorageService;
 
-
     @PostMapping
-    public void upload(@RequestParam("file") MultipartFile file) {
-        fileStorageService.storeFile(file);
+    public void upload(@RequestHeader("XUpload-File") String fileName, @RequestParam("file") MultipartFile file) {
+        fileStorageService.storeFile(file, fileName);
     }
 
 
@@ -40,16 +41,6 @@ public class UploadController {
     @GetMapping(path = "progress")
     public List<Object[]> getUploadProgress() {
         return fileStorageService.getUploadProgress();
-    }
-
-    @GetMapping(path = "files")
-    public List<String> getFileNamesInProgress() {
-        return fileStorageService.getFileNamesInProgress();
-    }
-
-    @GetMapping(path = "count")
-    public long countByInProgress() {
-        return fileStorageService.countByInProgress(true);
     }
 
 }
