@@ -42,5 +42,14 @@ public class UploadController {
         return fileStorageService.getUploadProgress();
     }
 
+    @GetMapping(path = "files")
+    public List<String> getFileNamesInProgress() {
+        return fileStorageService.getFileNamesInProgress();
+    }
+
+    @GetMapping(path = "count")
+    public long countByInProgress() {
+        return fileStorageService.countByInProgress(true);
+    }
 
 }

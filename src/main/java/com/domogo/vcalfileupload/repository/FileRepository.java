@@ -19,4 +19,9 @@ public interface FileRepository extends CrudRepository<FileRecord, Long> {
     @Query("SELECT id, fileSize, uploaded FROM FileRecord WHERE inProgress = TRUE")
     List<Object[]> getUploadProgress();
 
+    @Query("SELECT name FROM FileRecord WHERE inProgress = TRUE")
+    List<String> getFileNamesInProgress();
+
+    long countByInProgress(boolean inProgress);
+
 }

@@ -46,6 +46,16 @@ public class FileStorageService {
 
         // save file, get name, type and size and store in memory
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        List<String> filesCurrentlyUploading = getFileNamesInProgress();
+        long activeUploadsCount = countByInProgress(true);
+
+        if (filesCurrentlyUploading.contains(fileName)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "File " + fileName + " is currently uploading.");
+        }
+
+        if (activeUploadsCount >= 100) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Upload count limit exceeded, try again in a moment!");
+        }
 
         try {
             if (fileName.contains("..")) {
@@ -69,7 +79,7 @@ public class FileStorageService {
             long duration = System.currentTimeMillis() - startTime;
             // update that db record with upload duration and set inProgress to false
             fileRecord.setDuration(duration);
-            fileRecord.setInProgress(false);
+            // fileRecord.setInProgress(false);
             saveOrUpdate(fileRecord);
 
         } catch (IOException ex) {
@@ -86,12 +96,20 @@ public class FileStorageService {
         return fileRepository.findAll();
     }
 
-    public List<FileRecord> findByInProgress(boolean in_progress) {
-        return fileRepository.findByInProgress(in_progress);
+    public List<FileRecord> findByInProgress(boolean inProgress) {
+        return fileRepository.findByInProgress(inProgress);
     }
 
     public List<Object[]> getUploadProgress() {
         return fileRepository.getUploadProgress();
+    }
+
+    public List<String> getFileNamesInProgress() {
+        return fileRepository.getFileNamesInProgress();
+    }
+
+    public long countByInProgress(boolean inProgress) {
+        return fileRepository.countByInProgress(inProgress);
     }
 
 }
