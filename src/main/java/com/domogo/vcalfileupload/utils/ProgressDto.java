@@ -1,19 +1,20 @@
 package com.domogo.vcalfileupload.utils;
 
-public class UploadsResponseHelper {
+public class ProgressDto {
 
-    private final long id;
+    private final String id;
     private final long fileSize;
     private final long uploaded;
 
 
-    public UploadsResponseHelper(long id, long fileSize, long uploaded) {
+    public ProgressDto(String id, long fileSize, long uploaded) {
         this.id = id;
         this.fileSize = fileSize;
         this.uploaded = uploaded;
     }
 
-    public long getId() {
+
+    public String getId() {
         return this.id;
     }
 
@@ -26,6 +27,5 @@ public class UploadsResponseHelper {
     public long getUploaded() {
         return this.uploaded;
     }
-
 
 }

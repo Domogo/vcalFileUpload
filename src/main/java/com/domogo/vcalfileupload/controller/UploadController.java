@@ -1,9 +1,12 @@
 package com.domogo.vcalfileupload.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.service.FileStorageService;
+import com.domogo.vcalfileupload.utils.ProgressDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,13 +37,31 @@ public class UploadController {
 
 
     @GetMapping(path = "duration")
-    public List<FileRecord> uploadDuration() {
-        return fileStorageService.findByInProgress(false);
+    public List<String> uploadDuration() {
+        List<FileRecord> fileRecords = fileStorageService.findByInProgress(false);
+        List<String> durationResults = new ArrayList<>();
+
+        for (FileRecord fileRecord : fileRecords) {
+            durationResults.add("upload_duration{id=" + fileRecord.getId() + "} " + fileRecord.getDuration());
+        }
+
+        return durationResults;
     }
 
     @GetMapping(path = "progress")
-    public List<Object[]> getUploadProgress() {
-        return fileStorageService.getUploadProgress();
+    public HashMap<String, List<ProgressDto>> getUploadProgress() {
+        List<FileRecord> inProgress = fileStorageService.findByInProgress(true);
+        List<ProgressDto> progressData = new ArrayList<>();
+
+        for (FileRecord r : inProgress) {
+           ProgressDto p = new ProgressDto(r.getId(), r.getFileSize(), r.getUploaded());
+           progressData.add(p);
+        }
+
+        HashMap<String, List<ProgressDto>> response = new HashMap<>();
+        response.put("uploads", progressData);
+
+        return response;
     }
 
 }

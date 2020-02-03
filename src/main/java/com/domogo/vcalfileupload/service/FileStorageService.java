@@ -37,6 +37,10 @@ public class FileStorageService {
     }
 
 
+    /*
+        fileName is Nullable because of the case when multiple files are sent
+        with one request - can't set a header for multiple files
+    */
     public void storeFile(MultipartFile file, @Nullable String fileName) {
 
         // get start time, we have to track upload duration

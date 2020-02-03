@@ -18,8 +18,14 @@ through a REST API. Two different upload options: sequential and concurrent (par
 
 ## Details
 
-- files are stored in your (OS-specific) TMP dir.
-- in-memory DB (hibernate) has a File Model that creates a record on upload.
+The service accepts file uploads up to 50MB in size. Upload duration and progress are tracked and stored
+in an in-memory database. It's possible to see the duration of every finished upload in a session and see
+progress of currently uploading files ( NOTE: it's hard to catch locally as the upload spead is quite fast,
+which will result in an empty response. To see the actual progress you can spam the service with upload
+requests ). There can be up to a 100 active uploads, any requests made while the capacity is full will be
+turned down. Further more, there can be no two (or more) file uploading at the same time with the same
+name, but if the conflicting file has finished uploading, it can be overridden with another upload
+using the same file name.
 
 ## API docs
 
@@ -27,7 +33,11 @@ through a REST API. Two different upload options: sequential and concurrent (par
 
 - POST: `http://localhost:9090/api/v1/upload`
 
-### upload multiple
+- endpoint for uploading a file.
+- set `XUploads-File` header with a value that will be the uploaded file name.
+- the key under which the file is stored has to be named `file`, any other key will return an error.
+
+### upload multiple ( extras )
 
 - POST: `http://localhost:9090/api/v1/upload/multiple`
 
@@ -35,7 +45,10 @@ through a REST API. Two different upload options: sequential and concurrent (par
 
 - GET: `http://localhost:9090/api/v1/upload/progress`
 
+- displays the upload progress of files being uploaded at the moment.
+
 ### track duration
 
 - GET: `http://localhost:9090/api/v1/upload/duration`
-- For finished uploads displays the time it took to upload them.
+
+- displays the duration it took to upload files. Only displays those that have completed the upload process.
