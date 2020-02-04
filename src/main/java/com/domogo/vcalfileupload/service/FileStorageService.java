@@ -25,6 +25,8 @@ public class FileStorageService {
     @Autowired
     FileRepository fileRepository;
 
+    private long ACTIVE_LIMIT = 100;
+
     private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir"))
         .toAbsolutePath().normalize();
 
@@ -65,7 +67,7 @@ public class FileStorageService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "File " + fileName + " is currently uploading.");
         }
 
-        if (activeUploadsCount >= 100) {
+        if (activeUploadsCount >= ACTIVE_LIMIT) {
             throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Upload count limit exceeded, try again in a moment!");
         }
 
