@@ -52,12 +52,16 @@ public class FileStorageService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No file present in request.");
         }
 
-        if (fileName.isEmpty() ){
+        if (fileName.isEmpty()){
             fileName = StringUtils.cleanPath(file.getOriginalFilename());
         } else {
             // if file name already file type in name, remove it
             // We add the correct type using .getContentType from Multipart files
-            fileName = StringUtils.cleanPath(fileName.substring(0, fileName.indexOf(".")) + '.' + file.getContentType().split("/")[1]);
+            if (fileName.contains(".")){
+                fileName = StringUtils.cleanPath(fileName.substring(0, fileName.indexOf(".")) + '.' + file.getContentType().split("/")[1]);
+            } else {
+                fileName = StringUtils.cleanPath(fileName + '.' + file.getContentType().split("/")[1]);
+            }
         }
 
         List<String> filesCurrentlyUploading = fileRepository.getFileNamesInProgress();
