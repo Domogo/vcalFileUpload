@@ -27,9 +27,7 @@ public class FileStorageService {
 
     private long ACTIVE_LIMIT = 100;
 
-    private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir"))
-        .toAbsolutePath().normalize();
-
+    private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir")).toAbsolutePath().normalize();
 
     public void storeFiles(List<MultipartFile> files) {
 
@@ -38,11 +36,10 @@ public class FileStorageService {
         }
     }
 
-
     /*
-        fileName is Nullable because of the case when multiple files are sent
-        with one request - can't set a header for multiple files
-    */
+     * fileName is Nullable because of the case when multiple files are sent with
+     * one request - can't set a header for multiple files
+     */
     public void storeFile(MultipartFile file, @Nullable String fileName) {
 
         // get start time, we have to track upload duration
@@ -52,16 +49,13 @@ public class FileStorageService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "No file present in request.");
         }
 
-        if (fileName.isEmpty()){
+        if (fileName.isEmpty()) {
             fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        } else {
-            // if file name already file type in name, remove it
-            // We add the correct type using .getContentType from Multipart files
-            if (fileName.contains(".")){
-                fileName = StringUtils.cleanPath(fileName.substring(0, fileName.indexOf(".")) + '.' + file.getContentType().split("/")[1]);
-            } else {
-                fileName = StringUtils.cleanPath(fileName + '.' + file.getContentType().split("/")[1]);
-            }
+        }
+        // if file name from header doesn't have file extension but
+        // multipart file name does - assign that extension to file name from header
+        if (!fileName.contains(".") && file.getOriginalFilename().contains(".")) {
+            fileName = fileName + file.getOriginalFilename().substring(file.getOriginalFilename().indexOf("."));
         }
 
         List<String> filesCurrentlyUploading = fileRepository.getFileNamesInProgress();

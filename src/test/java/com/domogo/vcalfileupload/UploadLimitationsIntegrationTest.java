@@ -2,6 +2,7 @@ package com.domogo.vcalfileupload;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.FileInputStream;
 import java.util.Date;
 
 import com.domogo.vcalfileupload.model.FileRecord;
@@ -18,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 
 @ExtendWith(SpringExtension.class)
@@ -37,8 +39,12 @@ public class UploadLimitationsIntegrationTest {
     @Autowired
     FileStorageService fileStorageService;
 
+    @Autowired
+    CommonsMultipartResolver m_multipartResolver;
+
     @Test
     public void fileUpload_whenActiveUploadLimit_thenStatus429() throws Exception {
+
         // create a 100 active uploads mock
         for (int i = 0; i < 100; i++) {
             FileRecord fr = new FileRecord();
@@ -54,17 +60,50 @@ public class UploadLimitationsIntegrationTest {
         MockMultipartFile fakeFile = new MockMultipartFile("file", "test.zip", "application/zip", "somezip".getBytes());
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/upload")
                         .file(fakeFile)
-                        .header("XUpload-File", "NewFileName"))
+                        .header("XUpload-File", "NewFileName.zip"))
                     .andExpect(status().is(429));
-    }
-
-    @Test
-    public void fileUpload_whenFileSizeTooBig_thenStatus413() {
 
     }
 
     @Test
-    public void fileUpload_whenFileWithThatNameCurrentlyUploading_thenStatus409() {
+    public void fileUpload_whenFileSizeTooBig_thenStatus413() throws Exception {
+        // commons multipart resolver handles this correctly, but the test here returns
+        // 200 as MockMvc does not work with it, couldn't find a working way to test this.
+
+        // Mock sending a file larger than 50MB by putting a file of 80MB to input stream
+        FileInputStream fis = new FileInputStream("./FileTooBig.zip");
+        MockMultipartFile fakeFile = new MockMultipartFile("file", "test.zip", "application/zip", fis);
+
+        // try to make an upload request, the upload should fail - 100 parallel uploads is the limit
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/upload")
+                        .file(fakeFile)
+                        .header("XUpload-File", "NewFileName.zip"))
+                    .andExpect(status().is(413));
+
+    }
+
+    @Test
+    public void fileUpload_whenFileWithThatNameCurrentlyUploading_thenStatus409() throws Exception {
+
+        // create a mock active upload, since it is in progress it should block
+        // another upload with the same name from being uploaded
+
+        String fileName = "testName.zip";
+
+        FileRecord fr = new FileRecord();
+        Date date = new Date();
+        long timestamp = date.getTime();
+        fr.setId(fileName + "-" + timestamp);
+        fr.setName(fileName);
+        fr.setInProgress(true);
+        fileRepository.save(fr);
+
+        MockMultipartFile fakeFile = new MockMultipartFile("file", "test.zip", "application/zip", "somezip".getBytes());
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/upload")
+                        .file(fakeFile)
+                        .header("XUpload-File", fileName))
+                    .andExpect(status().is(409));
 
     }
 
