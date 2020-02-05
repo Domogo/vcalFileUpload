@@ -13,6 +13,6 @@ public class FileUploadExceptionAdvice {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<?> handleMaxSizeException() {
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("The file you're trying to send is too large. Max size is: " + MAX_UPLOAD_SIZE);
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("The file you're trying to send is too large. Max size is: " + MAX_UPLOAD_SIZE + " bytes.");
     }
 }

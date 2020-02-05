@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import com.domogo.vcalfileupload.model.FileRecord;
 import com.domogo.vcalfileupload.repository.FileRepository;
+import com.domogo.vcalfileupload.utils.ProgressDto;
 import com.domogo.vcalfileupload.utils.WriteFileUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,18 +31,8 @@ public class FileStorageService {
 
     private Path fileStorageLocation = Paths.get(System.getProperty("java.io.tmpdir")).toAbsolutePath().normalize();
 
-    public void storeFiles(List<MultipartFile> files) {
 
-        for (MultipartFile file : files) {
-            storeFile(file, null);
-        }
-    }
-
-    /*
-     * fileName is Nullable because of the case when multiple files are sent with
-     * one request - can't set a header for multiple files
-     */
-    public void storeFile(MultipartFile file, @Nullable String fileName) {
+    public void storeFile(MultipartFile file, String fileName) {
 
         // get start time, we have to track upload duration
         long startTime = System.currentTimeMillis();
@@ -99,20 +91,37 @@ public class FileStorageService {
 
     }
 
+
     public FileRecord saveOrUpdate(FileRecord file) {
         return fileRepository.save(file);
     }
 
-    public List<FileRecord> findAll() {
-        return fileRepository.findAll();
+
+    public List<String> uploadDuration() {
+        List<FileRecord> fileRecords = fileRepository.findByInProgress(false);
+        List<String> durationResults = new ArrayList<>();
+
+        for (FileRecord fileRecord : fileRecords) {
+            durationResults.add("upload_duration{id=" + fileRecord.getId() + "} " + fileRecord.getDuration());
+        }
+
+        return durationResults;
     }
 
-    public List<FileRecord> findByInProgress(boolean inProgress) {
-        return fileRepository.findByInProgress(inProgress);
-    }
 
-    public List<Object[]> getUploadProgress() {
-        return fileRepository.getUploadProgress();
+    public HashMap<String, List<ProgressDto>> getUploadProgress() {
+        List<FileRecord> inProgress = fileRepository.findByInProgress(true);
+        List<ProgressDto> progressData = new ArrayList<>();
+
+        for (FileRecord r : inProgress) {
+           ProgressDto p = new ProgressDto(r.getId(), r.getFileSize(), r.getUploaded());
+           progressData.add(p);
+        }
+
+        HashMap<String, List<ProgressDto>> response = new HashMap<>();
+        response.put("uploads", progressData);
+
+        return response;
     }
 
 }
