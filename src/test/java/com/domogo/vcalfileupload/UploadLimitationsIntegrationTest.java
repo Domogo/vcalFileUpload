@@ -19,7 +19,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 
 @ExtendWith(SpringExtension.class)
@@ -38,9 +37,6 @@ public class UploadLimitationsIntegrationTest {
 
     @Autowired
     FileStorageService fileStorageService;
-
-    @Autowired
-    CommonsMultipartResolver m_multipartResolver;
 
     @Test
     public void fileUpload_whenActiveUploadLimit_thenStatus429() throws Exception {

@@ -29,17 +29,20 @@ using the same file name.
 
 ## API docs
 
+- (Images from Postman)
+
 ### upload files
 
 - POST: `http://localhost:9090/api/v1/upload`
 
 - endpoint for uploading a file.
 - set `XUploads-File` header with a value that will be the uploaded file name.
-- the key under which the file is stored has to be named `file`, any other key will return an error.
 
-### upload multiple ( extras )
+![UploadHeader](readmeImages/uploadHeader.png)
 
-- POST: `http://localhost:9090/api/v1/upload/multiple`
+- Request body should contain a file under the key `file`.
+
+![UploadBody](readmeImages/uploadBody.png)
 
 ### track progress
 
@@ -47,8 +50,15 @@ using the same file name.
 
 - displays the upload progress of files being uploaded at the moment.
 
+![UploadProgress](readmeImages/uploadProgress.png)
+
+- NOTE: The upload progress is hard to catch locally. The upload speed is very and the files finish uploading within miliseconds.
+The above image is using altered data to show the funcionality of the endpoint.
+
 ### track duration
 
 - GET: `http://localhost:9090/api/v1/upload/duration`
 
 - displays the duration it took to upload files. Only displays those that have completed the upload process.
+
+![UploadDuration](readmeImages/uploadDuration.png)
