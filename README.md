@@ -62,3 +62,22 @@ The above image is using altered data to show the funcionality of the endpoint.
 - displays the duration it took to upload files. Only displays those that have completed the upload process.
 
 ![UploadDuration](readmeImages/uploadDuration.png)
+
+## Integration Tests
+
+### Parallel upload limit
+
+- fileUpload_whenActiveUploadLimit_thenStatus429
+- When there's a 100 active uploads, return HTTP code 429. (Too many requests).
+
+### Upload size limit (50MB)
+
+- fileUpload_whenFileSizeTooBig_thenStatus413
+- When file is over 50MB, return HTTP code 413 (Payload too large).
+- NOTE: The test is failing because the MockMvc is not using the MultipartResolver so it doesn't
+catch the exception from MultipartResolver - live testing catches it.
+
+### When multiple parallel uploads with the same name
+
+- fileUpload_whenFileWithThatNameCurrentlyUploading_thenStatus409
+- when there's a name conflict, return HTTP code 409 (Conflict).
